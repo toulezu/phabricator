@@ -1,3 +1,9 @@
+## 关于对 Phabricator 的学习
+
+- [Phabricator 在 Windows 环境上的部署与二次开发](http://ckjava.com/2017/07/03/Phabricator-Windows-setup/)
+- [Phabricator 在创建项目的时候自动创建一个 Herald 规则](http://ckjava.com/2017/07/22/Phabricator-project-Herald/)
+
+----------------------------------------------------------------------------------------------
 **Phabricator** is a collection of web applications which help software companies build better software.
 
 Phabricator includes applications for:
