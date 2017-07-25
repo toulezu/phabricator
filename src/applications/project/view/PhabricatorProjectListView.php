@@ -48,6 +48,35 @@ final class PhabricatorProjectListView extends AphrontView {
       ->setNoDataString($no_data);
 
     foreach ($projects as $key => $project) {
+      // 加载一个maniphest对象
+      $taskEdge = PhabricatorEdgeQuery::loadEdgeDatas(
+            $project->getPHID(),
+            '42',
+            '');
+
+      $task = new ManiphestTask();
+
+      $tasklink = "";
+      if (!empty($taskEdge)) {
+        foreach ($taskEdge as $key => $value) {
+          $taskPHID = $key;
+          $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."'");
+          if ($task !== null) {
+            // 任务的链接
+            $tasklink = phutil_tag(
+             'a',
+             array(
+              'href' => "/T".$task->getID(),
+              'class' => 'phui-oi-link',
+              'title' => $task->getTitle(),
+             ),
+             $task->getTitle());
+            // 这里只要最新的一个任务
+            break;
+          }
+        }
+      }
+
       $id = $project->getID();
 
       $icon = $project->getDisplayIconIcon();
@@ -56,6 +85,7 @@ final class PhabricatorProjectListView extends AphrontView {
 
       $icon_name = $project->getDisplayIconName();
 
+      // 这里加上任务数量和最新的任务链接
       $item = id(new PHUIObjectItemView())
         ->setHeader($project->getName())
         ->setHref("/project/view/{$id}/")
@@ -65,6 +95,10 @@ final class PhabricatorProjectListView extends AphrontView {
             $icon_icon,
             ' ',
             $icon_name,
+            ' ',
+            count($taskEdge),
+            ' ',
+            $tasklink,
           ));
 
       if ($project->getStatus() == PhabricatorProjectStatus::STATUS_ARCHIVED) {
