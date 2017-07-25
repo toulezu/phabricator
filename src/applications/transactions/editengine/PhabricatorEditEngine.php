@@ -2439,16 +2439,29 @@ abstract class PhabricatorEditEngine
     return false;
   }
 
-    /**
-     * 新增加项目的时候自动增加一个通知规则 herald
-     *
-     * author ck
-     *
-     * @param AphrontRequest $request
-     * @param PhabricatorUser $viewer
-     * @param PhabricatorProject $object
-     * @return array
-     */
+  /**
+   * 获取对象的所有字段对象(PhabricatorCustomFieldEditField)
+   *
+   * author ck
+   * 
+   * @param $object
+   * @return array|dict
+   */
+  public function loadObjectFields($object) {
+    $this->loadDefaultConfiguration();
+    return $this->buildEditFields($object);
+  }
+
+  /**
+   * 新增加项目的时候自动增加一个通知规则 herald
+   *
+   * author ck
+   *
+   * @param AphrontRequest $request
+   * @param PhabricatorUser $viewer
+   * @param PhabricatorProject $object
+   * @return array
+   */
   private function saveProjectNotificationRule(AphrontRequest $request, PhabricatorUser $viewer, PhabricatorProject $object) {
       $adapter = HeraldAdapter::getAdapterForContentType('PhabricatorProjectHeraldAdapter');
 

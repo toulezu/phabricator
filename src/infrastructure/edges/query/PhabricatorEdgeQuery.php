@@ -127,6 +127,21 @@ final class PhabricatorEdgeQuery extends PhabricatorQuery {
   }
 
   /**
+   * 加载一组 Edge 数据
+   * @param $src_phid
+   * @param $edge_type
+   * @return mixed
+   */
+  public static function loadEdgeDatas($src_phid, $edge_type) {
+    $edges = id(new PhabricatorEdgeQuery())
+        ->withSourcePHIDs(array($src_phid))
+        ->withEdgeTypes(array($edge_type))
+        ->execute();
+
+    return $edges[$src_phid][$edge_type];
+  }
+
+  /**
    * Convenience method for loading a single edge's metadata for
    * a given source, destination, and edge type. Returns null
    * if the edge does not exist or does not have metadata. Builds

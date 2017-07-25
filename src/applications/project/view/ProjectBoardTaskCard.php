@@ -69,11 +69,38 @@ final class ProjectBoardTaskCard extends Phobject {
     $color_map = ManiphestTaskPriority::getColorMap();
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
 
+    // 获取每个任务对象的完整字段
+    $maniphest_fields = id(new ManiphestEditEngine())
+     ->setViewer($viewer)
+     ->loadObjectFields($task);
+
+    // 获取每个任务对象的自定义字段的 开始时间 和 结束时间
+    $start_date = '';
+    $end_date = '';
+    foreach ($maniphest_fields as $key => $field) {
+      if (strstr($key, 'start date')) {
+        $start_date = $field->getValueForDefaults();
+      }
+      if (strstr($key, 'finish-date')) {
+        $end_date = $field->getValueForDefaults();
+      }
+    }
+
+    $start = '';
+    if ($start_date !== '') {
+      $start = date("m-d H:i", $start_date);
+    }
+
+    $end = '';
+    if ($end_date !== '') {
+      $end = date("m-d H:i", $end_date);
+    }
+
     $card = id(new PHUIObjectItemView())
       ->setObject($task)
       ->setUser($viewer)
       ->setObjectName('T'.$task->getID())
-      ->setHeader($task->getTitle())
+      ->setHeader($task->getTitle().' '.$start.'-'.$end)
       ->setGrippable($can_edit)
       ->setHref('/T'.$task->getID())
       ->addSigil('project-card')
