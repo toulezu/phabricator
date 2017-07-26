@@ -48,19 +48,18 @@ final class PhabricatorProjectListView extends AphrontView {
       ->setNoDataString($no_data);
 
     foreach ($projects as $key => $project) {
-      // 加载一个maniphest对象
+      // 加载一个项目对应的所有maniphest对象
       $taskEdge = PhabricatorEdgeQuery::loadEdgeDatas(
             $project->getPHID(),
-            '42',
+            '42', // 42 表示项目和任务的对应关系
             '');
 
-      $task = new ManiphestTask();
-
-      $tasklink = "";
+      $taskslink = array();
       if (!empty($taskEdge)) {
+        $count = 0;
         foreach ($taskEdge as $key => $value) {
           $taskPHID = $key;
-          $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."'");
+          $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'default' ");
           if ($task !== null) {
             // 任务的链接
             $tasklink = phutil_tag(
@@ -71,8 +70,12 @@ final class PhabricatorProjectListView extends AphrontView {
               'title' => $task->getTitle(),
              ),
              $task->getTitle());
-            // 这里只要最新的一个任务
-            break;
+            if ($count >= 5) { // 这里最多显示5个主任务
+              break;
+            }
+            $count++;
+            $taskslink[] = $tasklink;
+            $taskslink[] = ' ';
           }
         }
       }
@@ -98,7 +101,7 @@ final class PhabricatorProjectListView extends AphrontView {
             ' ',
             count($taskEdge),
             ' ',
-            $tasklink,
+            $taskslink,
           ));
 
       if ($project->getStatus() == PhabricatorProjectStatus::STATUS_ARCHIVED) {
