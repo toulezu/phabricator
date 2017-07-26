@@ -59,7 +59,7 @@ final class PhabricatorProjectListView extends AphrontView {
         $count = 0;
         foreach ($taskEdge as $key => $value) {
           $taskPHID = $key;
-          $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'default' ");
+          $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'default' and status != 'closed' ");
           if ($task !== null) {
             // 任务的链接
             $tasklink = phutil_tag(
