@@ -294,11 +294,34 @@ final class ManiphestTaskDetailController extends ManiphestController {
         ->setQueryParam('template', $id)
         ->setQueryParam('status', ManiphestTaskStatus::getDefaultStatus());
       $edit_uri = $this->getApplicationURI($edit_uri);
+
+      // 这里将创建子任务修改成 Create TestTask
+      $testtask_edit_uri = id(new PhutilURI("/task/edit/form/6/"))
+       ->setQueryParam('parent', $id)
+       ->setQueryParam('template', $id)
+       ->setQueryParam('subtype', 'test')
+       ->setQueryParam('status', ManiphestTaskStatus::getDefaultStatus());
+      $testtask_edit_uri = $this->getApplicationURI($testtask_edit_uri);
+
+      // 和 Create DevTask
+      $devtask_edit_uri = id(new PhutilURI("/task/edit/form/1/"))
+       ->setQueryParam('parent', $id)
+       ->setQueryParam('template', $id)
+       ->setQueryParam('subtype', 'dev')
+       ->setQueryParam('status', ManiphestTaskStatus::getDefaultStatus());
+      $devtask_edit_uri = $this->getApplicationURI($devtask_edit_uri);
+
     } else {
       // TODO: This will usually give us a somewhat-reasonable error page, but
       // could be a bit cleaner.
       $edit_uri = "/task/edit/{$id}/";
       $edit_uri = $this->getApplicationURI($edit_uri);
+
+      $testtask_edit_uri = "/task/edit/6/";
+      $testtask_edit_uri = $this->getApplicationURI($testtask_edit_uri);
+
+      $devtask_edit_uri = "/task/edit/1/";
+      $devtask_edit_uri = $this->getApplicationURI($devtask_edit_uri);
     }
 
     $subtask_item = id(new PhabricatorActionView())
@@ -308,12 +331,30 @@ final class ManiphestTaskDetailController extends ManiphestController {
       ->setDisabled(!$can_create)
       ->setWorkflow(!$can_create);
 
+    // 测试子任务
+    $testtask_item = id(new PhabricatorActionView())
+     ->setName(pht('Create TestTask'))
+     ->setHref($testtask_edit_uri)
+     ->setIcon('fa-level-down')
+     ->setDisabled(!$can_create)
+     ->setWorkflow(!$can_create);
+
+    // 开发子任务
+    $devtask_item = id(new PhabricatorActionView())
+     ->setName(pht('Create DevTask'))
+     ->setHref($devtask_edit_uri)
+     ->setIcon('fa-level-down')
+     ->setDisabled(!$can_create)
+     ->setWorkflow(!$can_create);
+
     $relationship_list = PhabricatorObjectRelationshipList::newForObject(
       $viewer,
       $task);
 
     $submenu_actions = array(
-      $subtask_item,
+      //$subtask_item,
+      $testtask_item,
+      $devtask_item,
       ManiphestTaskHasParentRelationship::RELATIONSHIPKEY,
       ManiphestTaskHasSubtaskRelationship::RELATIONSHIPKEY,
       ManiphestTaskMergeInRelationship::RELATIONSHIPKEY,

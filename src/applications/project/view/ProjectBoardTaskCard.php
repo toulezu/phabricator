@@ -88,12 +88,12 @@ final class ProjectBoardTaskCard extends Phobject {
 
     $start = '';
     if ($start_date !== '') {
-      $start = date("m-d H:i", $start_date);
+      $start = date("m-d", $start_date);
     }
 
     $end = '';
     if ($end_date !== '') {
-      $end = date("m-d H:i", $end_date);
+      $end = date("m-d", $end_date);
     }
 
     $card = id(new PHUIObjectItemView())
