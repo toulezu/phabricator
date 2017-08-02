@@ -27,7 +27,8 @@ final class PhabricatorCalendarEventSearchEngine
   }
 
   protected function buildCustomSearchFields() {
-    return array(
+    return array();
+    /*return array(
       id(new PhabricatorSearchDatasourceField())
         ->setLabel(pht('Hosts'))
         ->setKey('hostPHIDs')
@@ -63,7 +64,7 @@ final class PhabricatorCalendarEventSearchEngine
         ->setKey('display')
         ->setOptions($this->getViewOptions())
         ->setDefault('month'),
-    );
+    );*/
   }
 
   private function getCancelledOptions() {
@@ -98,7 +99,7 @@ final class PhabricatorCalendarEventSearchEngine
     $query = $this->newQuery();
     $viewer = $this->requireViewer();
 
-    if ($map['hostPHIDs']) {
+    /*if ($map['hostPHIDs']) {
       $query->withHostPHIDs($map['hostPHIDs']);
     }
 
@@ -141,7 +142,7 @@ final class PhabricatorCalendarEventSearchEngine
       $query
         ->withIsStub(false)
         ->setGenerateGhosts(true);
-    }
+    }*/
 
     return $query;
   }
@@ -233,8 +234,8 @@ final class PhabricatorCalendarEventSearchEngine
     $names = array(
       'month' => pht('Month View'),
       'day' => pht('Day View'),
-      'upcoming' => pht('Upcoming Events'),
-      'all' => pht('All Events'),
+      'upcoming' => pht('Upcoming Task'),
+      //'all' => pht('All Events'),
     );
 
     return $names;
@@ -294,7 +295,7 @@ final class PhabricatorCalendarEventSearchEngine
     $viewer = $this->requireViewer();
     $list = new PHUIObjectItemListView();
 
-    foreach ($events as $event) {
+    /*foreach ($events as $event) {
       if ($event->getIsGhostEvent()) {
         $monogram = $event->getParentEvent()->getMonogram();
         $index = $event->getSequenceIndex();
@@ -328,11 +329,87 @@ final class PhabricatorCalendarEventSearchEngine
       $item->addByline($host);
 
       $list->addItem($item);
+    }*/
+
+    // 将事件改成任务对象
+    $taskSearchEngine = new ManiphestTaskSearchEngine();
+    $taskSearchEngine->setViewer($viewer);
+
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+
+    $projectPHIDs = $query->getParameter('projectPHIDs');
+    if (isset($projectPHIDs)) {
+      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
+    }
+    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
+    if (isset($subscriberPHIDs)) {
+      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    }
+
+    $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
+    $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
+    $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
+
+    foreach ($all_tasks as $task) {
+
+      $task_fields = id(new ManiphestEditEngine())
+       ->setViewer($viewer)
+       ->loadObjectFields($task);
+
+      $start_date = '';
+      $end_date = '';
+      foreach ($task_fields as $key => $field) {
+        if (strstr($key, 'start date')) {
+          $start_date = $field->getValueForDefaults();
+        }
+        if (strstr($key, 'finish-date')) {
+          $end_date = $field->getValueForDefaults();
+        }
+      }
+
+      $start = '';
+      if ($start_date !== '') {
+        $start = date("m-d", $start_date);
+      }
+
+      $end = '';
+      if ($end_date !== '') {
+        $end = date("m-d", $end_date);
+      }
+
+      $item = id(new PHUIObjectItemView())
+       ->setUser($viewer)
+       ->setObject($task)
+       ->setObjectName($task->getMonogram())
+       ->setHeader($task->getTitle())
+       ->setHref($task->getURI());
+
+      $item->addAttribute(array($start, '-', $end));
+
+      if ($task->isClosed()) {
+        $item->setDisabled(true);
+      }
+
+      /*$status_icon = $event->getDisplayIcon($viewer);
+      $status_color = $event->getDisplayIconColor($viewer);
+      $status_label = $event->getDisplayIconLabel($viewer);*/
+
+      $status_icon = 'fa-anchor';
+      $status_color = 'green';
+      $status_label = '';
+
+      $item->setStatusIcon("{$status_icon} {$status_color}", $status_label);
+
+      $create_user = pht(
+       'Created by %s', $viewer->getRealName());
+      $item->addByline($create_user);
+
+      $list->addItem($item);
     }
 
     return $this->newResultView()
       ->setObjectList($list)
-      ->setNoDataString(pht('No events found.'));
+      ->setNoDataString(pht('No Tasks found.'));
   }
 
   private function buildCalendarMonthView(
@@ -371,7 +448,7 @@ final class PhabricatorCalendarEventSearchEngine
     $month_view->setUser($viewer);
 
     $viewer_phid = $viewer->getPHID();
-    foreach ($events as $event) {
+    /*foreach ($events as $event) {
       $epoch_min = $event->getStartDateTimeEpoch();
       $epoch_max = $event->getEndDateTimeEpoch();
 
@@ -382,13 +459,58 @@ final class PhabricatorCalendarEventSearchEngine
         ->setHostPHID($event->getHostPHID())
         ->setEpochRange($epoch_min, $epoch_max)
         ->setIsCancelled($event->getIsCancelled())
-        ->setName($event->getName())
+        ->setName($event->getName().' test')
         ->setURI($event->getURI())
         ->setIsAllDay($event->getIsAllDay())
         ->setIcon($event->getDisplayIcon($viewer))
         ->setViewerIsInvited($is_invited || $is_attending)
         ->setDatetimeSummary($event->renderEventDate($viewer, true))
         ->setIconColor($event->getDisplayIconColor($viewer));
+
+      $month_view->addEvent($event_view);
+    }*/
+
+    // 将事件改成任务对象
+    $taskSearchEngine = new ManiphestTaskSearchEngine();
+    $taskSearchEngine->setViewer($viewer);
+
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+    $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
+    $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
+    $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
+
+    foreach ($all_tasks as $task) {
+
+      $task_fields = id(new ManiphestEditEngine())
+       ->setViewer($viewer)
+       ->loadObjectFields($task);
+
+      $epoch_min = time();
+      $epoch_max = time();
+
+      foreach ($task_fields as $key => $field) {
+        if (strstr($key, 'start date')) {
+          $epoch_min = $field->getValueForDefaults();
+        }
+        if (strstr($key, 'finish-date')) {
+          $epoch_max = $field->getValueForDefaults();
+        }
+      }
+
+      $is_invited = true;
+      $is_attending = true;
+
+      $event_view = id(new AphrontCalendarEventView())
+       ->setHostPHID($task->getOwnerPHID())
+       ->setEpochRange($epoch_min, $epoch_max)
+       ->setIsCancelled(false)
+       ->setName($task->getTitle())
+       ->setURI($task->getURI())
+       ->setIsAllDay(false)
+       ->setIcon('fa-anchor')
+       ->setViewerIsInvited($is_invited || $is_attending)
+       ->setDatetimeSummary($task->getTitle())
+       ->setIconColor('green');
 
       $month_view->addEvent($event_view);
     }
@@ -435,7 +557,7 @@ final class PhabricatorCalendarEventSearchEngine
 
     $phids = mpull($events, 'getHostPHID');
 
-    foreach ($events as $event) {
+    /*foreach ($events as $event) {
       $can_edit = PhabricatorPolicyFilter::hasCapability(
         $viewer,
         $event,
@@ -458,6 +580,51 @@ final class PhabricatorCalendarEventSearchEngine
         ->setURI($event->getURI())
         ->setDatetimeSummary($event->renderEventDate($viewer, true))
         ->setIsCancelled($event->getIsCancelled());
+
+      $day_view->addEvent($event_view);
+    }*/
+
+    // 将事件改成任务对象
+    $taskSearchEngine = new ManiphestTaskSearchEngine();
+    $taskSearchEngine->setViewer($viewer);
+
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+    $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
+    $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
+    $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
+
+    foreach ($all_tasks as $task) {
+
+      $task_fields = id(new ManiphestEditEngine())
+       ->setViewer($viewer)
+       ->loadObjectFields($task);
+
+      $epoch_min = time();
+      $epoch_max = time();
+
+      foreach ($task_fields as $key => $field) {
+        if (strstr($key, 'start date')) {
+          $epoch_min = $field->getValueForDefaults();
+        }
+        if (strstr($key, 'finish-date')) {
+          $epoch_max = $field->getValueForDefaults();
+        }
+      }
+
+      $is_invited = true;
+      $is_attending = true;
+
+      $event_view = id(new AphrontCalendarEventView())
+       ->setHostPHID($task->getOwnerPHID())
+       ->setEpochRange($epoch_min, $epoch_max)
+       ->setIsCancelled(false)
+       ->setName($task->getTitle())
+       ->setURI($task->getURI())
+       ->setIsAllDay(false)
+       ->setIcon('fa-anchor')
+       ->setViewerIsInvited($is_invited || $is_attending)
+       ->setDatetimeSummary($task->getTitle())
+       ->setIconColor('green');
 
       $day_view->addEvent($event_view);
     }
