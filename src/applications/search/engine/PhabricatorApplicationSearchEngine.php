@@ -250,6 +250,15 @@ abstract class PhabricatorApplicationSearchEngine extends Phobject {
       foreach ($extensions as $extension) {
         $extension_fields = $extension->getSearchFields($object);
         foreach ($extension_fields as $extension_field) {
+          // 去掉 calendar 的 Subscribers 和 Tags 查询条件
+          if ($object instanceof PhabricatorCalendarEvent) {
+            if ($extension_field instanceof PhabricatorProjectSearchField) {
+              continue;
+            }
+            if ($extension_field instanceof PhabricatorSearchSubscribersField) {
+              continue;
+            }
+          }
           $fields[] = $extension_field;
         }
       }

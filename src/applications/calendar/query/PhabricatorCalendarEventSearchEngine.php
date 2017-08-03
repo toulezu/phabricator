@@ -27,7 +27,16 @@ final class PhabricatorCalendarEventSearchEngine
   }
 
   protected function buildCustomSearchFields() {
-    return array();
+    return array(
+     id(new PhabricatorOwnersSearchField())
+      ->setLabel(pht('Assigned'))
+      ->setKey('assignedPHIDs')
+      ->setConduitKey('assigned')
+      ->setAliases(array('assigned'))
+      ->setDescription(
+       pht('Search for tasks owned by a user from a list.')),
+    );
+
     /*return array(
       id(new PhabricatorSearchDatasourceField())
         ->setLabel(pht('Hosts'))
@@ -337,13 +346,9 @@ final class PhabricatorCalendarEventSearchEngine
 
     $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
-    $projectPHIDs = $query->getParameter('projectPHIDs');
-    if (isset($projectPHIDs)) {
-      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
-    }
-    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
-    if (isset($subscriberPHIDs)) {
-      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    $assignedPHIDs = $query->getParameter('assignedPHIDs');
+    if (isset($assignedPHIDs)) {
+      $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
 
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
@@ -476,13 +481,9 @@ final class PhabricatorCalendarEventSearchEngine
 
     $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
-    $projectPHIDs = $query->getParameter('projectPHIDs');
-    if (isset($projectPHIDs)) {
-      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
-    }
-    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
-    if (isset($subscriberPHIDs)) {
-      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    $assignedPHIDs = $query->getParameter('assignedPHIDs');
+    if (isset($assignedPHIDs)) {
+      $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
 
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
@@ -600,13 +601,9 @@ final class PhabricatorCalendarEventSearchEngine
 
     $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
-    $projectPHIDs = $query->getParameter('projectPHIDs');
-    if (isset($projectPHIDs)) {
-      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
-    }
-    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
-    if (isset($subscriberPHIDs)) {
-      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    $assignedPHIDs = $query->getParameter('assignedPHIDs');
+    if (isset($assignedPHIDs)) {
+      $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
 
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
