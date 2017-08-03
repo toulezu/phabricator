@@ -335,7 +335,7 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
     $projectPHIDs = $query->getParameter('projectPHIDs');
     if (isset($projectPHIDs)) {
