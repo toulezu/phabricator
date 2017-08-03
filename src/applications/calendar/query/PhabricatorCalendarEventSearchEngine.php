@@ -281,7 +281,7 @@ final class PhabricatorCalendarEventSearchEngine
     } else if ($this->isDayView($query)) {
       $result = $this->buildCalendarDayView($events, $query);
     } else {
-      $result = $this->buildCalendarListView($events, $query);
+      $result = $this->buildCalendarMonthView($events, $query); // 默认查询的是月视图
     }
 
     return $result;
