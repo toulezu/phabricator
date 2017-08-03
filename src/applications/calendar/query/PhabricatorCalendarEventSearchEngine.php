@@ -474,7 +474,7 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
     $projectPHIDs = $query->getParameter('projectPHIDs');
     if (isset($projectPHIDs)) {
@@ -598,7 +598,7 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
 
     $projectPHIDs = $query->getParameter('projectPHIDs');
     if (isset($projectPHIDs)) {
@@ -608,7 +608,7 @@ final class PhabricatorCalendarEventSearchEngine
     if (isset($subscriberPHIDs)) {
       $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
     }
-    
+
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
     $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
     $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
