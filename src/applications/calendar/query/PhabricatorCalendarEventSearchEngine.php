@@ -475,6 +475,16 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine->setViewer($viewer);
 
     $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+
+    $projectPHIDs = $query->getParameter('projectPHIDs');
+    if (isset($projectPHIDs)) {
+      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
+    }
+    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
+    if (isset($subscriberPHIDs)) {
+      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    }
+
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
     $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
     $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
@@ -589,6 +599,16 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine->setViewer($viewer);
 
     $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('assigned');
+
+    $projectPHIDs = $query->getParameter('projectPHIDs');
+    if (isset($projectPHIDs)) {
+      $task_saved_query->setParameter('projectPHIDs',$query->getParameter('projectPHIDs'));
+    }
+    $subscriberPHIDs = $query->getParameter('subscriberPHIDs');
+    if (isset($subscriberPHIDs)) {
+      $task_saved_query->setParameter('subscriberPHIDs',$query->getParameter('subscriberPHIDs'));
+    }
+    
     $task_pager = $taskSearchEngine->newPagerForSavedQuery($task_saved_query);
     $task_query = $taskSearchEngine->buildQueryFromSavedQuery($task_saved_query);
     $all_tasks = $taskSearchEngine->executeQuery($task_query, $task_pager);
