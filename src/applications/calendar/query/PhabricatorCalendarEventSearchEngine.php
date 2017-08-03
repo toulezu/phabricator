@@ -369,12 +369,12 @@ final class PhabricatorCalendarEventSearchEngine
 
       $start = '';
       if ($start_date !== '') {
-        $start = date("m-d", $start_date);
+        $start = phabricator_datetime($start_date, $viewer);
       }
 
       $end = '';
       if ($end_date !== '') {
-        $end = date("m-d", $end_date);
+        $end = phabricator_datetime($end_date, $viewer);
       }
 
       $item = id(new PHUIObjectItemView())
@@ -506,7 +506,7 @@ final class PhabricatorCalendarEventSearchEngine
        ->setIsCancelled(false)
        ->setName($task->getTitle())
        ->setURI($task->getURI())
-       ->setIsAllDay(false)
+       ->setIsAllDay(true)
        ->setIcon('fa-anchor')
        ->setViewerIsInvited($is_invited || $is_attending)
        ->setDatetimeSummary($task->getTitle())
@@ -620,7 +620,7 @@ final class PhabricatorCalendarEventSearchEngine
        ->setIsCancelled(false)
        ->setName($task->getTitle())
        ->setURI($task->getURI())
-       ->setIsAllDay(false)
+       ->setIsAllDay(true)
        ->setIcon('fa-anchor')
        ->setViewerIsInvited($is_invited || $is_attending)
        ->setDatetimeSummary($task->getTitle())
