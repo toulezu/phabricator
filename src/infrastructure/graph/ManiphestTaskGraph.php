@@ -61,6 +61,31 @@ final class ManiphestTaskGraph
         ),
         $full_title);
 
+      // 在主任务变成Test状态的时候增加提测链接
+      $submit_test_div = '';
+      if ($object instanceof ManiphestTask
+        && $object->getStatus() === 'test'
+        && $object->getEditEngineSubtype() === 'default') {
+
+        $submit_test_link = phutil_tag(
+         'a',
+         array(
+          'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$object->getID(),
+          'title' => '提测',
+          'style' => 'padding-left: 3px; font-weight: bold; color: #8E44AD;',
+          'target' => '_blank',
+         ),
+         '提测');
+
+        $submit_test_div = phutil_tag('div',
+         array(
+          'class' => 'phui-font-fa fa-external-link',
+          'style' => 'margin-left: 100px; color: #8E44AD;',
+          'aria-hidden' => 'true',
+         ),
+        $submit_test_link);
+      }
+
       $link = array(
         phutil_tag(
           'span',
@@ -70,6 +95,8 @@ final class ManiphestTaskGraph
           $object->getMonogram()),
         ' ',
         $link,
+        ' ',
+        $submit_test_div,
       );
     } else {
       $status = null;
