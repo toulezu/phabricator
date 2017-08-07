@@ -61,7 +61,7 @@ final class ManiphestTaskGraph
         ),
         $full_title);
 
-      // 在主任务变成Test状态的时候增加提测链接
+      // 当主任务变成Test状态的时候增加提测链接
       $submit_test_div = '';
       if ($object instanceof ManiphestTask
         && $object->getStatus() === 'test'
