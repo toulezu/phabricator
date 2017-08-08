@@ -78,11 +78,14 @@ final class ManiphestTaskGraph
         && $object->getStatus() === 'test'
         && $object->getEditEngineSubtype() === 'default') {
 
+        $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$object->getOwnerPHID()."'");
+        $ownername = urlencode(urlencode($ownerUser->getRealName()));
+
         $submit_test_link_title = '测试环境发布';
         $submit_test_link = phutil_tag(
          'a',
          array(
-          'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$object->getID(),
+          'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$object->getID().'&tester='.$ownername,
           'title' => $submit_test_link_title,
           'style' => 'padding-left: 3px; font-weight: bold; color: #8E44AD;',
           'target' => '_blank',
