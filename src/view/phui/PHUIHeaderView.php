@@ -367,6 +367,30 @@ final class PHUIHeaderView extends AphrontTagView {
         $property_list[] = $this->tags;
       }
 
+      // 对于主任务当状态变成TEST后增加提测链接
+      if ($this->policyObject instanceof ManiphestTask
+       && $this->policyObject->getStatus() === 'test'
+       && $this->policyObject->getEditEngineSubtype() === 'default') {
+
+        $submit_test_link = phutil_tag(
+         'a',
+         array(
+          'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$this->policyObject->getID(),
+          'title' => '提测',
+          'style' => 'padding-left: 3px; font-weight: bold; color: #8E44AD;',
+          'target' => '_blank',
+         ),
+         '提测');
+
+        $property_list[] = phutil_tag('span',
+         array(
+          'class' => 'phui-font-fa fa-external-link',
+          'style' => 'margin-left: 10px; color: #8E44AD;',
+          'aria-hidden' => 'true',
+         ),
+         $submit_test_link);
+      }
+
       $left[] = phutil_tag(
         'div',
         array(
