@@ -51,7 +51,18 @@ final class ManiphestTaskGraph
         $assigned = phutil_tag('em', array(), pht('None'));
       }
 
-      $full_title = $object->getTitle();
+      $task_flag= '';
+      if ($object->getEditEngineSubtype() === 'default') {
+        $task_flag= '[MAIN] ';
+      } else if ($object->getEditEngineSubtype() === 'dev') {
+        $task_flag= '[DEV] ';
+      } else if ($object->getEditEngineSubtype() === 'test') {
+        $task_flag= '[TEST] ';
+      } else if ($object->getEditEngineSubtype() === 'bug') {
+        $task_flag= '[BUG] ';
+      }
+
+      $full_title = $task_flag.$object->getTitle();
 
       $link = phutil_tag(
         'a',
