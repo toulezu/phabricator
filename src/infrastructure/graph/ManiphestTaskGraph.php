@@ -78,15 +78,16 @@ final class ManiphestTaskGraph
         && $object->getStatus() === 'test'
         && $object->getEditEngineSubtype() === 'default') {
 
+        $submit_test_link_title = '测试环境发布';
         $submit_test_link = phutil_tag(
          'a',
          array(
           'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$object->getID(),
-          'title' => '提测',
+          'title' => $submit_test_link_title,
           'style' => 'padding-left: 3px; font-weight: bold; color: #8E44AD;',
           'target' => '_blank',
          ),
-         '提测');
+         $submit_test_link_title);
 
         $submit_test_div = phutil_tag('div',
          array(
@@ -94,7 +95,7 @@ final class ManiphestTaskGraph
           'style' => 'margin-left: 100px; color: #8E44AD;',
           'aria-hidden' => 'true',
          ),
-        $submit_test_link);
+         $submit_test_link);
       }
 
       $link = array(
