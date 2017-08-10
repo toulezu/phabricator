@@ -108,14 +108,18 @@ final class PhabricatorProjectListView extends AphrontView {
 
       if (!empty($taskEdge)) {
         foreach ($taskEdge as $key => $value) {
-          $test_task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'test' and status != 'closed' ");
+          $test_task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'test' ");
           if ($test_task !== null) {
             // 任务的链接
+            $test_task_link_class = 'phui-tag-core phui-icon-view';
+            if ($test_task->isClosed()) {
+              $test_task_link_class .= 'phui-handle handle-status-closed';
+            }
             $test_task_link = phutil_tag(
              'a',
              array(
               'href' => "/T".$test_task->getID(),
-              'class' => 'phui-tag-core phui-icon-view',
+              'class' => $test_task_link_class,
               'title' => $test_task->getTitle(),
              ),
              'TEST:'.$test_task->getTitle());
