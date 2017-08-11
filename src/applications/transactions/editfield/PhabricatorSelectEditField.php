@@ -15,6 +15,39 @@ final class PhabricatorSelectEditField
     if ($this->options === null) {
       throw new PhutilInvalidStateException('setOptions');
     }
+    // 编辑任务对象,任务对象必须存在,根据不同类型的任务对象来设置不同的 status 选项
+    if ($this->getObject() !== null &&
+        $this->getObject()->getPHID() !== null &&
+        $this->getObject() instanceof ManiphestTask &&
+        $this->getKey() === 'status') {
+      if ($this->getObject()->getEditEngineSubtype() === 'default') {
+        return array(
+         'open' => 'Open',
+         'test' => 'Test',
+         'resolved' => 'Resolved',
+         'closed' => 'Closed',
+        );
+      }
+      if ($this->getObject()->getEditEngineSubtype() === 'test') {
+        return array(
+         'open' => 'Open',
+         'closed' => 'Closed',
+        );
+      }
+      if ($this->getObject()->getEditEngineSubtype() === 'dev') {
+        return array(
+         'open' => 'Open',
+         'closed' => 'Closed',
+        );
+      }
+      if ($this->getObject()->getEditEngineSubtype() === 'bug') {
+        return array(
+         'open' => 'Open',
+         'closed' => 'Closed',
+        );
+      }
+    }
+
     return $this->options;
   }
 
