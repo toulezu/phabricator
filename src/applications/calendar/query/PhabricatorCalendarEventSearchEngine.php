@@ -344,9 +344,15 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
-
     $assignedPHIDs = $query->getParameter('assignedPHIDs');
+
+    $query_key = 'all';
+    if (empty($assignedPHIDs)) {
+      $query_key = 'assigned';
+    }
+
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin($query_key);
+
     if (isset($assignedPHIDs)) {
       $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
@@ -479,9 +485,14 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
-
     $assignedPHIDs = $query->getParameter('assignedPHIDs');
+
+    $query_key = 'all';
+    if (empty($assignedPHIDs)) {
+      $query_key = 'assigned';
+    }
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin($query_key);
+
     if (isset($assignedPHIDs)) {
       $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
@@ -599,9 +610,15 @@ final class PhabricatorCalendarEventSearchEngine
     $taskSearchEngine = new ManiphestTaskSearchEngine();
     $taskSearchEngine->setViewer($viewer);
 
-    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin('all');
-
     $assignedPHIDs = $query->getParameter('assignedPHIDs');
+
+    $query_key = 'all';
+    if (empty($assignedPHIDs)) {
+      $query_key = 'assigned';
+    }
+
+    $task_saved_query = $taskSearchEngine->buildSavedQueryFromBuiltin($query_key);
+
     if (isset($assignedPHIDs)) {
       $task_saved_query->setParameter('assignedPHIDs',$query->getParameter('assignedPHIDs'));
     }
