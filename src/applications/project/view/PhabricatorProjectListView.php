@@ -61,21 +61,79 @@ final class PhabricatorProjectListView extends AphrontView {
           $taskPHID = $key;
           $task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'default' and status != 'closed' ");
           if ($task !== null) {
-            // 任务的链接
+            // 主任务的链接
             $tasklink = phutil_tag(
              'a',
              array(
               'href' => "/T".$task->getID(),
-              'class' => 'phui-oi-link',
+              'class' => 'phui-tag-core phui-icon-view',
               'title' => $task->getTitle(),
              ),
-             $task->getTitle());
+             'MAIN:'.$task->getTitle());
+
+            $task_span = phutil_tag(
+             'span',
+             array(
+              'class' => 'phui-tag-view phui-tag-type-outline phui-tag-blue phui-tag-slim phui-tag-icon-view',
+             ),
+             $tasklink
+            );
+
             if ($count >= 5) { // 这里最多显示5个主任务
               break;
             }
             $count++;
-            $taskslink[] = $tasklink;
+            $taskslink[] = $task_span;
             $taskslink[] = ' ';
+          }
+        }
+      }
+
+      // 显示一个测试子任务
+      $no_test_task_info = phutil_tag(
+       'span',
+       array(
+        'class' => 'phui-tag-core phui-icon-view',
+       ),
+        'no test sub task'
+      );
+
+      $test_task_link_item = phutil_tag(
+       'span',
+       array(
+        'class' => 'phui-tag-view phui-tag-type-outline phui-tag-indigo phui-tag-slim phui-tag-icon-view',
+       ),
+       $no_test_task_info
+      );
+
+      if (!empty($taskEdge)) {
+        foreach ($taskEdge as $key => $value) {
+          $test_task = id(new ManiphestTask())->loadOneWhere("phid = '".$key."' and subtype = 'test' ");
+          if ($test_task !== null) {
+            // 任务的链接
+            $test_task_link_class = 'phui-tag-core phui-icon-view';
+            if ($test_task->isClosed()) {
+              $test_task_link_class .= 'phui-handle handle-status-closed';
+            }
+            $test_task_link = phutil_tag(
+             'a',
+             array(
+              'href' => "/T".$test_task->getID(),
+              'class' => $test_task_link_class,
+              'title' => $test_task->getTitle(),
+             ),
+             'TEST:'.$test_task->getTitle());
+
+            $test_task_span = phutil_tag(
+             'span',
+             array(
+              'class' => 'phui-tag-view phui-tag-type-outline phui-tag-indigo phui-tag-slim phui-tag-icon-view',
+             ),
+             $test_task_link
+            );
+
+            $test_task_link_item = $test_task_span;
+            break;
           }
         }
       }
@@ -102,6 +160,8 @@ final class PhabricatorProjectListView extends AphrontView {
             count($taskEdge),
             ' ',
             $taskslink,
+            ' ',
+            $test_task_link_item
           ));
 
       if ($project->getStatus() == PhabricatorProjectStatus::STATUS_ARCHIVED) {

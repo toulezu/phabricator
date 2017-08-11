@@ -603,4 +603,82 @@ final class ManiphestTask extends ManiphestDAO
     return new ManiphestTaskEditEngineLock();
   }
 
+  public function getDisplayIcon(PhabricatorUser $viewer) {
+    if ($this->getIsCancelled()) {
+      return 'fa-times';
+    }
+
+    if ($viewer->isLoggedIn()) {
+      $viewer_phid = $viewer->getPHID();
+      if ($this->isRSVPInvited($viewer_phid)) {
+        return 'fa-users';
+      } else {
+        $status = $this->getUserInviteStatus($viewer_phid);
+        switch ($status) {
+          case PhabricatorCalendarEventInvitee::STATUS_ATTENDING:
+            return 'fa-check-circle';
+          case PhabricatorCalendarEventInvitee::STATUS_INVITED:
+            return 'fa-user-plus';
+          case PhabricatorCalendarEventInvitee::STATUS_DECLINED:
+            return 'fa-times-circle';
+        }
+      }
+    }
+
+    if ($this->isImportedEvent()) {
+      return 'fa-download';
+    }
+
+    return $this->getIcon();
+  }
+
+  public function getDisplayIconColor(PhabricatorUser $viewer) {
+    if ($this->getIsCancelled()) {
+      return 'red';
+    }
+
+    if ($this->isImportedEvent()) {
+      return 'orange';
+    }
+
+    if ($viewer->isLoggedIn()) {
+      $viewer_phid = $viewer->getPHID();
+      if ($this->isRSVPInvited($viewer_phid)) {
+        return 'green';
+      }
+
+      $status = $this->getUserInviteStatus($viewer_phid);
+      switch ($status) {
+        case PhabricatorCalendarEventInvitee::STATUS_ATTENDING:
+          return 'green';
+        case PhabricatorCalendarEventInvitee::STATUS_INVITED:
+          return 'green';
+        case PhabricatorCalendarEventInvitee::STATUS_DECLINED:
+          return 'grey';
+      }
+    }
+
+    return 'bluegrey';
+  }
+
+  public function getDisplayIconLabel(PhabricatorUser $viewer) {
+    if ($this->getIsCancelled()) {
+      return pht('Cancelled');
+    }
+
+    if ($viewer->isLoggedIn()) {
+      $status = $this->getUserInviteStatus($viewer->getPHID());
+      switch ($status) {
+        case PhabricatorCalendarEventInvitee::STATUS_ATTENDING:
+          return pht('Attending');
+        case PhabricatorCalendarEventInvitee::STATUS_INVITED:
+          return pht('Invited');
+        case PhabricatorCalendarEventInvitee::STATUS_DECLINED:
+          return pht('Declined');
+      }
+    }
+
+    return null;
+  }
+
 }

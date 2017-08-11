@@ -311,6 +311,14 @@ final class ManiphestTaskDetailController extends ManiphestController {
        ->setQueryParam('status', ManiphestTaskStatus::getDefaultStatus());
       $devtask_edit_uri = $this->getApplicationURI($devtask_edit_uri);
 
+      // 和 Create Bug
+      $bug_edit_uri = id(new PhutilURI("/task/edit/form/4/"))
+       ->setQueryParam('parent', $id)
+       ->setQueryParam('template', $id)
+       ->setQueryParam('subtype', 'bug')
+       ->setQueryParam('status', ManiphestTaskStatus::getDefaultStatus());
+      $bug_edit_uri = $this->getApplicationURI($bug_edit_uri);
+
     } else {
       // TODO: This will usually give us a somewhat-reasonable error page, but
       // could be a bit cleaner.
@@ -322,6 +330,9 @@ final class ManiphestTaskDetailController extends ManiphestController {
 
       $devtask_edit_uri = "/task/edit/1/";
       $devtask_edit_uri = $this->getApplicationURI($devtask_edit_uri);
+
+      $bug_edit_uri = "/task/edit/4/";
+      $bug_edit_uri = $this->getApplicationURI($bug_edit_uri);
     }
 
     $subtask_item = id(new PhabricatorActionView())
@@ -347,6 +358,14 @@ final class ManiphestTaskDetailController extends ManiphestController {
      ->setDisabled(!$can_create)
      ->setWorkflow(!$can_create);
 
+    // bug
+    $bug_item = id(new PhabricatorActionView())
+     ->setName(pht('Create Bug'))
+     ->setHref($bug_edit_uri)
+     ->setIcon('fa-level-down')
+     ->setDisabled(!$can_create)
+     ->setWorkflow(!$can_create);
+
     $relationship_list = PhabricatorObjectRelationshipList::newForObject(
       $viewer,
       $task);
@@ -355,6 +374,7 @@ final class ManiphestTaskDetailController extends ManiphestController {
       //$subtask_item,
       $testtask_item,
       $devtask_item,
+      $bug_item,
       ManiphestTaskHasParentRelationship::RELATIONSHIPKEY,
       ManiphestTaskHasSubtaskRelationship::RELATIONSHIPKEY,
       ManiphestTaskMergeInRelationship::RELATIONSHIPKEY,

@@ -51,7 +51,18 @@ final class ManiphestTaskGraph
         $assigned = phutil_tag('em', array(), pht('None'));
       }
 
-      $full_title = $object->getTitle();
+      $task_flag= '';
+      if ($object->getEditEngineSubtype() === 'default') {
+        $task_flag= '[MAIN] ';
+      } else if ($object->getEditEngineSubtype() === 'dev') {
+        $task_flag= '[DEV] ';
+      } else if ($object->getEditEngineSubtype() === 'test') {
+        $task_flag= '[TEST] ';
+      } else if ($object->getEditEngineSubtype() === 'bug') {
+        $task_flag= '[BUG] ';
+      }
+
+      $full_title = $task_flag.$object->getTitle();
 
       $link = phutil_tag(
         'a',
@@ -60,6 +71,35 @@ final class ManiphestTaskGraph
           'title' => $full_title,
         ),
         $full_title);
+
+      // 当主任务变成Test状态的时候增加提测链接
+      $submit_test_div = '';
+      if ($object instanceof ManiphestTask
+        && $object->getStatus() === 'test'
+        && $object->getEditEngineSubtype() === 'default') {
+
+        $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$object->getOwnerPHID()."'");
+        $ownername = urlencode(urlencode($ownerUser->getRealName()));
+
+        $submit_test_link_title = '测试环境发布';
+        $submit_test_link = phutil_tag(
+         'a',
+         array(
+          'href' => 'http://finance.tools.qa.nt.ctripcorp.com/BigScm/com.ctrip.scm.web.view.release.PhaRnApply.d?taskId=T'.$object->getID().'&tester='.$ownername,
+          'title' => $submit_test_link_title,
+          'style' => 'padding-left: 3px; font-weight: bold; color: #8E44AD;',
+          'target' => '_blank',
+         ),
+         $submit_test_link_title);
+
+        $submit_test_div = phutil_tag('div',
+         array(
+          'class' => 'phui-font-fa fa-external-link',
+          'style' => 'margin-left: 100px; color: #8E44AD;',
+          'aria-hidden' => 'true',
+         ),
+         $submit_test_link);
+      }
 
       $link = array(
         phutil_tag(
@@ -70,6 +110,8 @@ final class ManiphestTaskGraph
           $object->getMonogram()),
         ' ',
         $link,
+        ' ',
+        $submit_test_div,
       );
     } else {
       $status = null;

@@ -78,7 +78,7 @@ final class PhabricatorCalendarEventListController
   protected function buildNavigationItems() {
     $items = array();
 
-    $items[] = id(new PHUIListItemView())
+    /*$items[] = id(new PHUIListItemView())
       ->setType(PHUIListItemView::TYPE_LABEL)
       ->setName(pht('Import/Export'));
 
@@ -89,6 +89,7 @@ final class PhabricatorCalendarEventListController
     $items[] = id(new PHUIListItemView())
       ->setName('Exports')
       ->setHref('/calendar/export/');
+    */
 
     return $items;
   }
