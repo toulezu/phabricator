@@ -24,7 +24,6 @@ final class PhabricatorSelectEditField
         return array(
          'open' => 'Open',
          'test' => 'Test',
-         'resolved' => 'Resolved',
          'closed' => 'Closed',
         );
       }
@@ -43,6 +42,9 @@ final class PhabricatorSelectEditField
       if ($this->getObject()->getEditEngineSubtype() === 'bug') {
         return array(
          'open' => 'Open',
+         'resolved' => 'Resolved',
+         'wontfix' => 'Wontfix',
+         'invalid' => 'Invalid',
          'closed' => 'Closed',
         );
       }

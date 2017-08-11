@@ -1006,7 +1006,6 @@ abstract class PhabricatorEditEngine
         $status_option = array(
          'open' => 'Open',
          'test' => 'Test',
-         'resolved' => 'Resolved',
          'closed' => 'Closed',
         );
       }
@@ -1025,6 +1024,9 @@ abstract class PhabricatorEditEngine
       if ($config->getSubtype() === 'bug') {
         $status_option = array(
          'open' => 'Open',
+         'resolved' => 'Resolved',
+         'wontfix' => 'Wontfix',
+         'invalid' => 'Invalid',
          'closed' => 'Closed',
         );
       }
