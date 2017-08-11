@@ -5,6 +5,7 @@
 - [在 Phabricator 项目列表中增加任务数和最新任务的链接](http://ckjava.com/2017/07/25/Phabricator-list-item-task/) -> [#2](https://github.com/toulezu/phabricator/pull/2)
 - [在 Phabricator workborad 的卡片上显示开始和结束时间](http://ckjava.com/2017/07/25/Phabricator-list-item-task/) -> [#2](https://github.com/toulezu/phabricator/pull/2)
 - [在 Phabricator 任务详情页右边增加创建子任务的快捷链接](http://ckjava.com/2017/08/01/Phabricator-subtask/) -> [#3](https://github.com/toulezu/phabricator/pull/3)
+- [在 Phabricator 中控制不同类型的任务表单 status 字段显示不同的选项列表](http://ckjava.com/2017/08/11/Phabricator-task-subType/) -> [#4](https://github.com/toulezu/phabricator/pull/4)
 
 ----------------------------------------------------------------------------------------------
 **Phabricator** is a collection of web applications which help software companies build better software.
