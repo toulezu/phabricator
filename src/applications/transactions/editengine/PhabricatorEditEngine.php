@@ -997,41 +997,44 @@ abstract class PhabricatorEditEngine
       ->attachEngine($this);
 
     // 新增任务的时候根据form的配置来手动定义status下拉框的值
-    $status_editfield = $fields['status'];
-    if ($object instanceof ManiphestTask &&
-      $status_editfield instanceof PhabricatorSelectEditField) {
+    if (isset($fields['status'])) {
+      $status_editfield = $fields['status'];
 
-      $status_option = array();
-      if ($config->getSubtype() === 'default') {
-        $status_option = array(
-         'open' => 'Open',
-         'test' => 'Test',
-         'closed' => 'Closed',
-        );
-      }
-      if ($config->getSubtype() === 'test') {
-        $status_option = array(
-         'open' => 'Open',
-         'closed' => 'Closed',
-        );
-      }
-      if ($config->getSubtype() === 'dev') {
-        $status_option = array(
-         'open' => 'Open',
-         'closed' => 'Closed',
-        );
-      }
-      if ($config->getSubtype() === 'bug') {
-        $status_option = array(
-         'open' => 'Open',
-         'resolved' => 'Resolved',
-         'wontfix' => 'Wontfix',
-         'invalid' => 'Invalid',
-         'closed' => 'Closed',
-        );
-      }
+      if ($object instanceof ManiphestTask &&
+       $status_editfield instanceof PhabricatorSelectEditField) {
 
-      $status_editfield->setOptions($status_option);
+        $status_option = array();
+        if ($config->getSubtype() === 'default') {
+          $status_option = array(
+           'open' => 'Open',
+           'test' => 'Test',
+           'closed' => 'Closed',
+          );
+        }
+        if ($config->getSubtype() === 'test') {
+          $status_option = array(
+           'open' => 'Open',
+           'closed' => 'Closed',
+          );
+        }
+        if ($config->getSubtype() === 'dev') {
+          $status_option = array(
+           'open' => 'Open',
+           'closed' => 'Closed',
+          );
+        }
+        if ($config->getSubtype() === 'bug') {
+          $status_option = array(
+           'open' => 'Open',
+           'resolved' => 'Resolved',
+           'wontfix' => 'Wontfix',
+           'invalid' => 'Invalid',
+           'closed' => 'Closed',
+          );
+        }
+
+        $status_editfield->setOptions($status_option);
+      }
     }
 
     // NOTE: Don't prompt users to override locks when creating objects,
