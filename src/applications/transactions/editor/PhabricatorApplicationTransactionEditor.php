@@ -850,7 +850,7 @@ abstract class PhabricatorApplicationTransactionEditor
     }
 
     // 这里根据 ManiphestTransaction 对象中的 newvalue 来判断是否输入了值
-    $define_error_array = array();
+    /*$define_error_array = array();
     if ($object instanceof ManiphestTask &&
       $object->getPHID() === null) { // 只判断新增的情况
       foreach ($xactions as $xaction) {
@@ -869,7 +869,7 @@ abstract class PhabricatorApplicationTransactionEditor
           }
         }
       }
-    }
+    }*/
 
     $xactions = $this->expandTransactions($object, $xactions);
     $xactions = $this->expandSupportTransactions($object, $xactions);
@@ -902,7 +902,7 @@ abstract class PhabricatorApplicationTransactionEditor
       }
 
       // 最后将自定义的错误判断合并
-      $errors = array_merge($errors, $define_error_array);
+      //$errors = array_merge($errors, $define_error_array);
 
       if ($errors) {
         throw new PhabricatorApplicationTransactionValidationException($errors);
