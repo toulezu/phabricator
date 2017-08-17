@@ -855,14 +855,14 @@ abstract class PhabricatorApplicationTransactionEditor
       $object->getPHID() === null) { // 只判断新增的情况
       foreach ($xactions as $xaction) {
         if ($xaction->getTransactionType() === 'core:subscribers') { // Subscribers 验证不能为空
-          if (empty($xaction->getNewValue()) && empty($xaction->getOldValue())) {
+          if (empty($xaction->getNewValue())) {
             $validateError = new PhabricatorApplicationTransactionValidationError('core:subscribers', 'Required','Subscribers is Required.',null);
             $validateError->setIsMissingFieldError(true);
             $define_error_array[] = $validateError;
           }
         }
         if ($xaction->getTransactionType() === 'core:edge') { // Tags 不能为空
-          if (empty($xaction->getNewValue()) && empty($xaction->getOldValue())) {
+          if (empty($xaction->getNewValue())) {
             $validateError = new PhabricatorApplicationTransactionValidationError('core:edge', 'Required','Tags is Required.',null);
             $validateError->setIsMissingFieldError(true);
             $define_error_array[] = $validateError;
