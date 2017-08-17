@@ -113,6 +113,10 @@ final class ManiphestTaskOwnerTransaction
       $old = $xaction->getOldValue();
       $new = $xaction->getNewValue();
       if (!strlen($new)) {
+        if ($object instanceof ManiphestTask) {
+          $errors[] = $this->newInvalidError(
+           pht('Assigned To is required.'));
+        }
         continue;
       }
 

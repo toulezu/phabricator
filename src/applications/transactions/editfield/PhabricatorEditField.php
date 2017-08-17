@@ -393,6 +393,50 @@ abstract class PhabricatorEditField extends Phobject {
         $form->appendRemarkupInstructions($instructions);
       }
 
+      // 对于不同的form，自定义字段可以必填也可以非必填
+      // appid list 字段，对于主任务是必填的，test task, dev task, bug 来说不是必填的
+      // setError 可以在右边显示 Required
+      if ($this->getObject() instanceof ManiphestTask) { // 所有的自定义字段
+        if ($this instanceof PhabricatorCustomFieldEditField) {
+          $control->setError(true);
+          if ($this->getLabel() === 'Start Date' ||
+            $this->getLabel() === 'Finish Date') {
+            $this->setValue(time());
+          }
+
+          if ($this->getLabel() === 'Actual Hours') {
+            if ($this->getObject()->getEditEngineSubtype() === 'default' ||
+             $this->getObject()->getEditEngineSubtype() === 'dev') {
+              $control->setError(false);
+            }
+          }
+        }
+        if ($this instanceof PhabricatorTextEditField && // Title
+          $this->getLabel() === 'Title') {
+          $control->setError(true);
+        }
+        if ($this instanceof PhabricatorUsersEditField && // Assigned To
+          $this->getLabel() === 'Assigned To') {
+          $control->setError(true);
+        }
+        if ($this instanceof PhabricatorSelectEditField && // Status
+          $this->getLabel() === 'Status') {
+          $control->setError(true);
+        }
+        if ($this instanceof PhabricatorRemarkupEditField && // Description
+          $this->getLabel() === 'Description') {
+          $control->setError(true);
+        }
+        if ($this instanceof PhabricatorProjectsEditField && // Tags
+          $this->getLabel() === 'Tags') {
+          $control->setError(true);
+        }
+        if ($this instanceof PhabricatorSubscribersEditField && // Subscribers
+          $this->getLabel() === 'Subscribers') {
+          $control->setError(true);
+        }
+      }
+
       $form->appendControl($control);
     }
     return $this;

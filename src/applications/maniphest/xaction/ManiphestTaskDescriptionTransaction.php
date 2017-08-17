@@ -57,5 +57,17 @@ final class ManiphestTaskDescriptionTransaction
     return $changes;
   }
 
+  public function validateTransactions($object, array $xactions) {
+    $errors = array();
+
+    if ($this->isEmptyTextTransaction($object->getDescription(), $xactions)) {
+      if ($object instanceof ManiphestTask) {
+        $errors[] = $this->newRequiredError(
+         pht('Description is required.'));
+      }
+    }
+
+    return $errors;
+  }
 
 }

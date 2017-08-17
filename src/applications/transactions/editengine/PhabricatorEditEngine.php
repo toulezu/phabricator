@@ -996,6 +996,9 @@ abstract class PhabricatorEditEngine
     $config = $this->getEditEngineConfiguration()
       ->attachEngine($this);
 
+    // 这里设置后，方便新增任务的时候判断任务的类型
+    $object->setEditEngineSubtype($config->getSubtype());
+
     // 新增任务的时候根据form的配置来手动定义status下拉框的值
     if (isset($fields['status'])) {
       $status_editfield = $fields['status'];

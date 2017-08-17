@@ -849,6 +849,28 @@ abstract class PhabricatorApplicationTransactionEditor
       $xaction->attachViewer($actor);
     }
 
+    // 这里根据 ManiphestTransaction 对象中的 newvalue 来判断是否输入了值
+    $define_error_array = array();
+    if ($object instanceof ManiphestTask &&
+      $object->getPHID() === null) { // 只判断新增的情况
+      foreach ($xactions as $xaction) {
+        if ($xaction->getTransactionType() === 'core:subscribers') { // Subscribers 验证不能为空
+          if (empty($xaction->getNewValue()) && empty($xaction->getOldValue())) {
+            $validateError = new PhabricatorApplicationTransactionValidationError('core:subscribers', 'Required','Subscribers is Required.',null);
+            $validateError->setIsMissingFieldError(true);
+            $define_error_array[] = $validateError;
+          }
+        }
+        if ($xaction->getTransactionType() === 'core:edge') { // Tags 不能为空
+          if (empty($xaction->getNewValue()) && empty($xaction->getOldValue())) {
+            $validateError = new PhabricatorApplicationTransactionValidationError('core:edge', 'Required','Tags is Required.',null);
+            $validateError->setIsMissingFieldError(true);
+            $define_error_array[] = $validateError;
+          }
+        }
+      }
+    }
+
     $xactions = $this->expandTransactions($object, $xactions);
     $xactions = $this->expandSupportTransactions($object, $xactions);
     $xactions = $this->combineTransactions($xactions);
@@ -878,6 +900,9 @@ abstract class PhabricatorApplicationTransactionEditor
           unset($errors[$key]);
         }
       }
+
+      // 最后将自定义的错误判断合并
+      $errors = array_merge($errors, $define_error_array);
 
       if ($errors) {
         throw new PhabricatorApplicationTransactionValidationException($errors);
@@ -2160,6 +2185,65 @@ abstract class PhabricatorApplicationTransactionEditor
           if (!$field->shouldEnableForRole($role_xactions)) {
             continue;
           }
+
+          $proxy = $field->getProxy();
+
+          if ($object instanceof ManiphestTask) {
+            $subtype = $object->getEditEngineSubtype();
+
+            $proxy->setRequired(true); // 默认都是必填
+
+            if ($subtype === 'default' &&
+              $proxy->getFieldName() === 'Actual Hours') {
+              $proxy->setRequired(false);
+
+              // 对于 appid list 验证是否满足输入要求
+              if (isset($groups['std:maniphest:mycompany:appid_list'])) {
+                $appid_list = $groups['std:maniphest:mycompany:appid_list'];
+                if (!empty($appid_list) &&
+                 $appid_list[0] instanceof ManiphestTransaction) {
+                  $appid_list_newvalue = $appid_list[0]->getNewvalue();
+
+                  $match_error = array();
+                  $matches = array();
+                  if (!preg_match('/^(\d+,)*\d+$/', $appid_list_newvalue, $matches)) {
+                    $validateError = new PhabricatorApplicationTransactionValidationError('core:customfield', 'Required','AppId List must like 100008303,100008304 or 100008303.',null);
+                    $validateError->setIsMissingFieldError(true);
+
+                    $match_error[] = $validateError;
+                    $errors[] = $match_error;
+                  }
+                }
+              }
+            }
+
+            if ($subtype === 'dev') {
+              if ($proxy->getFieldName() === 'Actual Hours' ||
+               $proxy->getFieldName() === 'AppId List' ||
+               $proxy->getFieldName() === 'Classification') {
+                $proxy->setRequired(false);
+              }
+            }
+
+            if ($subtype === 'test') {
+              if ($proxy->getFieldName() === 'Actual Hours' ||
+               $proxy->getFieldName() === 'Estimated Hours' ||
+               $proxy->getFieldName() === 'AppId List' ||
+               $proxy->getFieldName() === 'Classification') {
+                $proxy->setRequired(false);
+              }
+            }
+
+            if ($subtype === 'bug') {
+              if ($proxy->getFieldName() === 'Actual Hours' ||
+               $proxy->getFieldName() === 'Estimated Hours' ||
+               $proxy->getFieldName() === 'AppId List') {
+                $proxy->setRequired(false);
+              }
+            }
+
+          }
+
           $errors[] = $field->validateApplicationTransactions(
             $this,
             $type,
