@@ -368,13 +368,33 @@ final class PHUIHeaderView extends AphrontTagView {
       }
 
       // 对于主任务当状态变成TEST后增加提测链接
+      // 从主任务下找测试子任务的创建人作为提测人，如果没有留空
       if ($this->policyObject instanceof ManiphestTask
        && $this->policyObject->getStatus() === 'test'
        && $this->policyObject->getEditEngineSubtype() === 'default') {
 
-        $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$this->policyObject->getOwnerPHID()."'");
+        // 根据当前任务对象的PHID找到下属的子任务
+        $taskEdge = PhabricatorEdgeQuery::loadEdgeDatas(
+         $this->policyObject->getPHID(),
+         '3',
+         '');
+
+        // 提测人
+        $ownername = '';
+        if (!empty($taskEdge)) {
+          foreach ($taskEdge as $key => $value) {
+            $edge_task_obj = id(new ManiphestTask())->loadOneWhere("phid = '".$key."'");
+            if ($edge_task_obj !== null &&
+             $edge_task_obj->getEditEngineSubtype() === 'test') {
+              $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$edge_task_obj->getOwnerPHID()."'");
+              $ownername = urlencode(urlencode($ownerUser->getRealName()));
+              break;
+            }
+          }
+        }
+
+        // po　负责人
         $authorUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$this->policyObject->getAuthorPHID()."'");
-        $ownername = urlencode(urlencode($ownerUser->getRealName()));
         $authorname = urlencode(urlencode($authorUser->getRealName()));
 
         $submit_test_link_title = '测试环境发布';

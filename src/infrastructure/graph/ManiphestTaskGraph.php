@@ -73,14 +73,32 @@ final class ManiphestTaskGraph
         $full_title);
 
       // 当主任务变成Test状态的时候增加提测链接
+      // 从主任务下找测试子任务的创建人作为提测人，如果没有留空
       $submit_test_div = '';
       if ($object instanceof ManiphestTask
         && $object->getStatus() === 'test'
         && $object->getEditEngineSubtype() === 'default') {
 
-        $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$object->getOwnerPHID()."'");
+        // 根据当前任务对象的PHID找到下属的子任务
+        $taskEdge = PhabricatorEdgeQuery::loadEdgeDatas(
+         $object->getPHID(),
+         '3',
+         '');
+
+        $ownername = '';
+        if (!empty($taskEdge)) {
+          foreach ($taskEdge as $key => $value) {
+            $edge_task_obj = id(new ManiphestTask())->loadOneWhere("phid = '".$key."'");
+            if ($edge_task_obj !== null &&
+             $edge_task_obj->getEditEngineSubtype() === 'test') {
+              $ownerUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$edge_task_obj->getOwnerPHID()."'");
+              $ownername = urlencode(urlencode($ownerUser->getRealName()));
+              break;
+            }
+          }
+        }
+
         $authorUser = id(new PhabricatorUser())->loadOneWhere("phid = '".$object->getAuthorPHID()."'");
-        $ownername = urlencode(urlencode($ownerUser->getRealName()));
         $authorname = urlencode(urlencode($authorUser->getRealName()));
 
         $submit_test_link_title = '测试环境发布';
